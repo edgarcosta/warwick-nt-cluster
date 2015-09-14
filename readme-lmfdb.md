@@ -24,7 +24,7 @@ and also run the server (as one would for local development), making sure to use
 cd ~/lmfdb
 git pull origin beta
 export BETA=1
-~/sage-beta/sage -python ./start-lmfdb.py -p 37777
+~/sage-beta/sage -python ./start-lmfdb.py -p 37788
 ```
 and then open your browser to lmfdb.warwick.ac.uk:37788 (or use ssh tunelling to a local port).
 
