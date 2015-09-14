@@ -1,0 +1,3 @@
+#/usr/bin/env bash
+mongod --dbpath=/home/lmfdb/db --shutdown
+

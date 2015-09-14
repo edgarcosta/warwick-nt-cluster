@@ -1,0 +1,55 @@
+[From an email of Harald 2015-02-08]
+
+The script does a few things, if I remember correctly:
+
+Ok, I wrote something, checked, and it is not as I remember.
+
+1. it creates a mongodb dump in a new timestamped directory
+1.1 it deletes the admin/users database
+
+2. it makes a backup of the uncompressed database files to the bup
+storage. This is this system, where you can store incremental
+backups. Therefore, we theoretically have all backups inside bup.
+
+3. Then it compresses the database files and removes the directories
+
+4. it moves the remaining timestamped directory to data/db 
+
+5. and finally, it searches for older than 40 days directories in the
+data/db directory and deletes them!
+
+todel="`find data/db -maxdepth 1 -mindepth 1 -ctime +40 -type d`"
+echo "the following older directories in data/db are deleted: $todel"
+rm -rf $todel
+
+All this is in ~/bkb-db.sh
+
+and the bup-storage is in ~/bup ... and I just checked, it takes a bit
+more than a minute to list things, but the entries are there. Below,
+commands are bold, hope you can see this. You can see the timestamps
+of all backups in there. Each of them lets you reconstruct all the
+dumped database files.
+
+lmfdb@lmfdb:~/bup$ BUP_DIR=. bup ls lmfdb/latest/
+
+HTPicard/              admin/                 hgm/                   modularforms2/         test_long_int/         
+Lfunction/             ap_statistics/         hmfs/                  modularforms_2010/     test_pdehaye/          
+Lfunctions/            bmfs/                  knowledge/             mwf_dbname/            transitivegroups/      
+MaassWaveForm/         contrib/               limbo/                 numberfields/          upload/                
+MaassWaveForms/        ellcurves/             localfields/           quadratic_twists/      userdb/                
+SL2Zsubgroups/         elliptic_curves/       modforms/              siegel_modular_forms/                         
+WebNewForms/           halfintegralmf/        modularforms/          test/                                         
+lmfdb@lmfdb:~/bup$ BUP_DIR=. bup ls lmfdb/
+
+2013-09-14-145119@  2013-11-17-095847@  2014-03-16-011659@  2014-06-08-020447@  2014-08-31-033112@  2014-11-23-033942@  
+2013-09-15-010709@  2013-11-24-095920@  2014-03-23-011830@  2014-06-15-024626@  2014-09-07-034500@  2014-11-30-034505@  
+2013-09-16-104446@  2013-12-01-095921@  2014-03-30-021512@  2014-06-22-032402@  2014-09-14-041721@  2014-12-07-034400@  
+2013-09-16-191917@  2013-12-08-095954@  2014-04-06-011418@  2014-06-29-032702@  2014-09-21-035310@  2014-12-14-035656@  
+2013-09-22-095944@  2013-12-15-100031@  2014-04-13-011731@  2014-07-06-035441@  2014-09-28-034942@  2014-12-21-040616@  
+2013-09-29-100025@  2013-12-22-095826@  2014-04-20-011651@  2014-07-13-033648@  2014-10-05-034350@  2014-12-28-035035@  
+2013-10-06-100156@  2013-12-29-095904@  2014-04-27-011431@  2014-07-20-034742@  2014-10-12-041303@  2015-01-04-034024@  
+2013-10-13-100053@  2014-01-05-100024@  2014-05-04-011955@  2014-07-27-032737@  2014-10-19-034226@  2015-01-11-035003@  
+2013-10-20-095946@  2014-01-12-100145@  2014-05-11-011611@  2014-08-03-035400@  2014-10-26-030333@  2015-02-01-021245@  
+2013-10-27-100046@  2014-01-19-100129@  2014-05-18-011508@  2014-08-10-034935@  2014-11-02-034631@  2015-02-08-021126@  
+2013-11-03-095935@  2014-03-11-003101@  2014-05-25-011705@  2014-08-17-033402@  2014-11-09-033717@  latest@             
+2013-11-10-100022@  2014-03-14-002522@  2014-06-01-011745@  2014-08-24-035933@  2014-11-16-035511@ 
