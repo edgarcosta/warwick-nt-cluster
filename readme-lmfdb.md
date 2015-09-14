@@ -24,8 +24,8 @@ and also run the server (as one would for local development), making sure to use
 cd ~/lmfdb
 git pull origin beta
 export BETA=1
-~/sage-beta/sage -python ./start-lmfdb -p 37777
+~/sage-beta/sage -python ./start-lmfdb.py -p 37777
 ```
-and then open your browser to lmfdb.warwick.ac.uk:37777 (or use ssh tunelling to a local port).
+and then open your browser to lmfdb.warwick.ac.uk:37788 (or use ssh tunelling to a local port).
 
 It is not normally necessary to manually start or restart either server.  One situation is to change the Sage version running (see readme-sage for that).  Another is if either server stops running for an unknown reason (which does happen, if rarely), then use the start script (but make sure that the mongod process is running first).
