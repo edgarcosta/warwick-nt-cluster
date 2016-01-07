@@ -1,0 +1,96 @@
+lmfdb.warwick.ac.uk disk setup
+
+Physically there are 12 Physical Disks (PD), each of 4T capacity.
+They are in 3 rows of 4 numbered as follows:
+
+    0  1  2  3
+    4  5  6  7
+    8  9 10 11
+
+Hardware RAID configuration: there are 11 Drive Groups (DG) and 11
+Virtual Drives (VD) whose numbering is not quite natural:
+
+DG0 includes PD0+PD1 in VD1, under RAID-1.
+DG1 includes PD2     in VD0 (!) under RAID-0
+DG2 includes PD3     in VD2     under RAID-0
+DG{n} includes PD{n+1} in VD{n} under RAID-0 for n=2,3,...,10.
+
+DG0 = VD1 is the boot drive and contains all the Operating System.
+because of the RAID1 it appears to the O/S as a single 4T (actually
+3.6T) drive.  This holds both the root partition (3.6T) containing the
+operating system and home directories, and also the /boot partitiion
+(229M).
+
+Use "lsblk" to see the situation.
+
+Warning: /boot fills up regularly.  The unattended system package
+upgrades result in new kernel versions being put in there, which take
+up around 25M each.  These need to be cleared out regularly --  see
+the file server-notes.txt for hints about this.
+
+DG1-DG10 (the other 10 disks, VD0, VD2,...,VD10) use no hardware RAID,
+i.e. they are set as RAID-0.  There is a single partition /data on
+device /dev/sdg, which is configured under BTRFS.  This allows each of
+the 10 physical disks to be brough online / offline individually.  At
+present (since March 2015) 6 of these are in use, as revealed by:
+
+jec@lmfdb:~/system$ sudo btrfs fi show
+Label: lmfdb  uuid: 495a3b08-5ae4-45e5-a994-d2aa0ca1c480
+	Total devices 6 FS bytes used 9.42TiB
+	devid    1 size 3.64TiB used 3.25TiB path /dev/sda
+	devid    2 size 3.64TiB used 3.25TiB path /dev/sdc
+	devid    3 size 3.64TiB used 3.25TiB path /dev/sdd
+	devid    4 size 3.64TiB used 3.25TiB path /dev/sde
+	devid    5 size 3.64TiB used 3.25TiB path /dev/sdf
+	devid    6 size 3.64TiB used 3.25TiB path /dev/sdg
+
+The O/S sees only one partition, on device /dev/sdg: see /etc/fstab
+where the relevant entry is
+
+UUID=495a3b08-5ae4-45e5-a994-d2aa0ca1c480 /data btrfs defaults,noatime,compress,user_subvol_rm_allowed 0 1
+
+The O/S thinks (using "df -h /data") it has size 22T of which 19T are
+currently used, but this is not accurate since btrfs manages its own
+RAID on that.  In fact 9.42T are used (see above output) but (in
+effect) duplicated by btrfs.
+
+Note that the physical disk block devices used by this partition are
+/dev/sd{x} for x=a,c,d,e,f,g (NOT b!).  I think these letters
+correspond to the VDs, so /dev/sda=VD0, /dev/sdc=VD2, ...,
+/dev/sdg=VD6 and the reason for /dev/sdb being missing is that it is
+the other DG, i.e. DG0 (=VD1).
+
+To add a new device, use "sudo btrfs device add", for example 
+
+"sudo btrfs device add /dev/sdh /data" to add VD7
+"sudo btrfs device add /dev/sdh /data" to add VD8
+"sudo btrfs device add /dev/sdh /data" to add VD9
+"sudo btrfs device add /dev/sdh /data" to add VD10
+
+followed by "sudo btrfs balance /data".  This takes a very long time; you
+can use "sudo btrfs fi show to see how it is going.
+
+Another useful command is "sudo btrfs fi df /data":
+
+Data, RAID1: total=9.72TiB, used=9.40TiB
+System, RAID1: total=8.00MiB, used=1.43MiB
+System, single: total=4.00MiB, used=0.00
+Metadata, RAID1: total=18.00GiB, used=16.69GiB
+Metadata, single: total=8.00MiB, used=0.00
+
+[After writing the above I did "sudo btrfs device add /dev/sdh /data"
+on Thu Jan  7 16:35:24 GMT 2016, after which "sudo btrfs fi show"
+shows
+
+
+Label: lmfdb  uuid: 495a3b08-5ae4-45e5-a994-d2aa0ca1c480
+        Total devices 7 FS bytes used 9.42TiB
+        devid    1 size 3.64TiB used 3.25TiB path /dev/sda
+        devid    2 size 3.64TiB used 3.25TiB path /dev/sdc
+        devid    3 size 3.64TiB used 3.25TiB path /dev/sdd
+        devid    4 size 3.64TiB used 3.25TiB path /dev/sde
+        devid    5 size 3.64TiB used 3.25TiB path /dev/sdf
+        devid    6 size 3.64TiB used 3.25TiB path /dev/sdg
+        devid    7 size 3.64TiB used 0.00 path /dev/sdh
+
+and have just started the balancing with "sudo btrfs balance /data".]
