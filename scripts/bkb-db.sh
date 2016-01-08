@@ -44,14 +44,14 @@ cd $timestamp
 $NICE rm -rf userdb admin '*'
 #find -maxdepth 1 -mindepth 1 -type d | parallel --eta 'tar cjf {}.tar.bz2 {}'
 # the compression level -L is 5, default is 7. if it is fast enough, increase it!
-for DIR in `find -maxdepth 1 -mindepth 1 -type d`; do
-    lrztar -v -o "$DIR.tar.lrz" "$DIR"
-    #$NICE tar --lzma -cf "$DIR.tar.lmza" "$DIR"
-    $NICE rm -rf "$DIR"
-done
+#for DIR in `find -maxdepth 1 -mindepth 1 -type d`; do
+#    lrztar -v -o "$DIR.tar.lrz" "$DIR"
+#    #$NICE tar --lzma -cf "$DIR.tar.lmza" "$DIR"
+#    $NICE rm -rf "$DIR"
+#done
 
-sha1sum * > sha1sums.txt
-log "compression finished + sha1sums created"
+find -size +10M -print0 | xargs -0 sha1sum > sha1sums.txt
+#log "compression finished + sha1sums created"
 
 # move to the public directory
 cd
