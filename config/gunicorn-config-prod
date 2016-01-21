@@ -1,0 +1,10 @@
+bind = "127.0.0.1:37001"
+workers = 20
+SESSION_PROTECTION=None
+daemon = True
+pidfile = '/home/lmfdb/gunicorn.pid'
+logfile = '/home/lmfdb/lmfdb-git-prod/flasklog'
+default_proc_name = 'lmfdb'
+timeout = 20
+max_requests = 100
+

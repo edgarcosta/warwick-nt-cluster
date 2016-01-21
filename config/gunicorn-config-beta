@@ -1,0 +1,10 @@
+bind = "127.0.0.1:37002"
+workers = 10
+SESSION_PROTECTION=None
+daemon = True
+pidfile = '/home/lmfdb/gunicorn-beta.pid'
+default_proc_name = 'lmfdb-beta'
+timeout = 30
+env = 'BETA=1'
+max_requests = 100
+
