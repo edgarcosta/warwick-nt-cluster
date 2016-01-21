@@ -3,8 +3,14 @@ workers = 10
 SESSION_PROTECTION=None
 daemon = True
 pidfile = '/home/lmfdb/gunicorn-beta.pid'
+# 
+errorlog = '/home/lmfdb/lmfdb-git-beta/errorlog'
+accesslog = '/home/lmfdb/lmfdb-git-beta/accesslog'
+loglevel = 'info' # change to 'debug' for more output
+logfile = '/home/lmfdb/lmfdb-git-beta/flasklog'
+#
+raw_env = ['BETA=1', 'NO_DEBUG=1']
 default_proc_name = 'lmfdb-beta'
 timeout = 30
-env = 'BETA=1'
 max_requests = 100
 
