@@ -9,7 +9,7 @@ accesslog = '/home/lmfdb/lmfdb-git-beta/accesslog'
 loglevel = 'info' # change to 'debug' for more output
 logfile = '/home/lmfdb/lmfdb-git-beta/flasklog'
 #
-raw_env = ['BETA=1', 'NO_DEBUG=1']
+raw_env = ['BETA=1']
 default_proc_name = 'lmfdb-beta'
 timeout = 30
 max_requests = 100
