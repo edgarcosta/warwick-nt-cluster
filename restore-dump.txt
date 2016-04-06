@@ -1,0 +1,17 @@
+For some reason the mongodump script produces empty BSON files.
+The mongorestore script doesn't like those and you need to avoid those while restoring the DB from a dump.
+A script can be written to take care of this. 
+However, since this is a worst case scenario I just leave here some pseudo code, that should take care of it, however never tested in real life:
+
+1- Find all the empty BSON files
+$ find . -size 0 -name "*.bson" | cut -f 1,2 -d. > empty_files
+
+2- move everything associated to the empty_files somewhere else, for example:
+$ cat empty_files | xargs -t -I {} mkdir -p ../ignore/{}
+$ cat empty_files | xargs -t -I @ sh -c "mv  @.* ../ignore/@"
+
+Now you should be good to go.
+
+3- Something like this
+$ mongorestore --drop -j 8 DIRECTORYWITHDUMP/
+
