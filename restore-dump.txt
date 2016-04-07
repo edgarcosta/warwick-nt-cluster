@@ -1,3 +1,6 @@
+Be aware, if we are running multiple instances in a replica set, then restoring from dump won't help to get a stale replica up to date.
+https://docs.mongodb.org/manual/tutorial/resync-replica-set-member/
+
 For some reason the mongodump script produces empty BSON files.
 The mongorestore script doesn't like those and you need to avoid those while restoring the DB from a dump.
 A script can be written to take care of this. 
