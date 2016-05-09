@@ -1,0 +1,17 @@
+127.0.0.1	localhost
+127.0.1.1	lmfdb.warwick.ac.uk lmfdb   warwick
+
+#192.168.13.2    lmfdb-ib
+192.168.14.1    lmfdb-ib
+192.168.14.2    atkin-ib
+192.168.13.1    lehner-ib
+
+8.34.219.164    m0
+104.154.18.133  m1
+
+# The following lines are desirable for IPv6 capable hosts
+::1     ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
