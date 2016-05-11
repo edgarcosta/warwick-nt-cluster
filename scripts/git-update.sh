@@ -3,7 +3,7 @@
 # "log" command writes to /var/log/syslog with the specified tag
 log () { logger -t LMFDB-GIT-UPDATE "$@"; }
 
-echo running git update script >> $HOME/crontab.log
+#echo running git update script >> $HOME/crontab.log
 
 set -e # fail on error
 set -u # show unused variables
