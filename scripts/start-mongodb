@@ -1,2 +1,2 @@
 #/usr/bin/env bash
-numactl --interleave=all mongod --config mongod.conf 
+numactl --interleave=all /home/lmfdb/bin/mongod --config /home/lmfdb/mongod.conf 
