@@ -30,7 +30,10 @@ rm -rf latest
 mkdir -p latest
 cp -rl $timestamp/* latest/
 cd latest
-rm -rf userdb admin '*'
+mkdir ~/dump-admin/$timestamp
+mv userdb ~/dump-admin/$timestamp/
+mv admin ~/dump-admin/$timestamp/
+rm -rf '*'
 cd ..
 chmod -R ug+rw latest
 
