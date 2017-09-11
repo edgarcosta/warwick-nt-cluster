@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 export BUP_DIR=~/bup
+export DUMP_DIR=/storage/lmfdb/dumps
 
 # "log" command writes to /var/log/syslog with the specified tag
 log () { logger -t LMFDB-BKB "$@"; }
@@ -11,6 +12,14 @@ set -u # show unused variables
 NICE="nice ionice -c 3"
 
 cd # go into $HOME directory
+source passwords.txt
+
+if [[ $LMFDB_PASS = "" || $EDITOR_PASS = "" || $ADMIN_PASS = "" ]]; then
+  echo "required passwords LMFDB_PASS and EDITOR_PASS and ADMIN_PASS not set in passwords.txt"
+  exit -1
+fi
+
+
 # cd `dirname "$0"`
 # go into the dump directory, backup will be in a subdir
 
@@ -21,7 +30,8 @@ timestamp=`date -u +%Y%m%d-%H%M`
 mkdir $timestamp
 log "new backup started in $timestamp"
 
-$NICE 'mongodump --port 37010 -u "$MONGO_USERNAME" -p "$MONGO_PASSWORD" --authenticationDatabase admin -o $timestamp'
+echo $NICE mongodump --port 37010 -u admin -p "$ADMIN_PASS" --authenticationDatabase admin -o $timestamp
+$NICE mongodump --port 37010 -u admin -p "$ADMIN_PASS" --authenticationDatabase admin -o $timestamp
 $NICE rm -rvf $timestamp/'*' && echo 'deleted directory "*"' || echo 'no directory "*" and nothing deleted ...'
 log "mongodump finished"
 
@@ -30,9 +40,13 @@ rm -rf latest
 mkdir -p latest
 cp -rl $timestamp/* latest/
 cd latest
-rm -rf userdb admin '*'
+mkdir ~/dump-admin/$timestamp
+mv userdb ~/dump-admin/$timestamp/
+mv admin ~/dump-admin/$timestamp/
+rm -rf '*'
 cd ..
 chmod -R ug+rw latest
+rm -rf latest
 
 # bup backup of $timestamp
 $NICE bup index -uv ~/dump/$timestamp
@@ -55,12 +69,17 @@ find -size +10M -print0 | xargs -0 sha1sum > sha1sums.txt
 
 # move to the public directory
 cd
-mv -v dump/$timestamp data/db/
-log "moved directory to data/db/$timestamp"
+mv -v dump/$timestamp $DUMP_DIR
+log "moved directory to $DUMP_DIR/$timestamp"
 
-# last step should be to get rid of older directories in data/db
+# last step should be to get rid of older directories in data/db and $DUMP_DIR
 
-todel="`find data/db -maxdepth 1 -mindepth 1 -ctime +40 -type d`"
+todel="`find data/db -maxdepth 1 -mindepth 1 -ctime +36 -type d`"
 echo "the following older directories in data/db are deleted: $todel"
+rm -rf $todel
+log "deleted old directories: $todel"
+
+todel="`find $DUMP_DIR -maxdepth 1 -mindepth 1 -ctime +36 -type d`"
+echo "the following older directories in $DUMP_DIR are deleted: $todel"
 rm -rf $todel
 log "deleted old directories: $todel"
